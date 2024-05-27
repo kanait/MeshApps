@@ -15,21 +15,21 @@ VC のフォルダの中の loopsub.sln をダブルクリックして Release x
 ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake が必要です．
 g++, make は xcode command line tools が必要となります．
 GLFW, GLEW, cmake は，brew を使ってあらかじめインストールしてください．
-
+```
 % brew install glfw glew cmake
-
+```
 展開フォルダの中で以下を実行してください．
-
+```
 % mkdir build
 % cd build
 % cmake -DCMAKE_BUILD_TYPE=Release ..
 % make
-
+```
 （コンパイルの際 warning が出ますが気にしないでください）
 コンパイルが終了したら build フォルダで以下を実行してください．
-
+```
 % ./loopsub/loopsub ../bunnynh_sub500.obj
-
+```
 何も表示されないウインドウが出てきたら正常に実行できています．
 
 [linux(ubuntu)]
