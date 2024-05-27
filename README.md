@@ -7,7 +7,7 @@
 
 コンパイル方法はPCの種類によって異なります．
 
-## Windows
+## Windows (Visual Studio)
 
 コンパイルには Visual Studio Community が必要です．
 https://visualstudio.microsoft.com/ja/vs/community/
@@ -45,11 +45,11 @@ GLFW, GLEW, cmake, eigen は，brew を使ってあらかじめインストー�
 ```
 何も表示されないウインドウが出てきたら正常に実行できています．
 
-## linux(ubuntu)
+## linux/WSL2 ubuntu
 
-GLFW, GLEW, cmake, eigen をapt 等を使ってインストールする必要があります．
+g++ make GLFW, GLEW, cmake, eigen を apt 等を使ってインストールする必要があります．
 ```
-% sudo apt install libglfw3-dev libglew-dev cmake libeigen3-dev
+% sudo apt install g++ make libglfw3-dev libglew-dev cmake libeigen3-dev
 ```
 あとは macOS と一緒です．
 
