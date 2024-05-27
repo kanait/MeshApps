@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\eigen;..\render_Eigen;..\external\glew-2.2.0\include;..\external\glfw-3.3.7.bin.WIN64\include;..\meshL;..\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\external\eigen;..\render_Eigen;..\external\glew-2.2.0\include;..\external\glfw-3.3.7.bin.WIN64\include;..\meshL;..\util;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
