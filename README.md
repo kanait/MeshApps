@@ -37,7 +37,7 @@ GLFW, GLEW, cmake は，brew を使ってあらかじめインストールして
 （コンパイルの際 warning が出ますが気にしないでください）
 コンパイルが終了したら build フォルダで以下を実行してください．
 ```
-% ./loopsub/loopsub ../bunnynh_sub500.obj
+% ./loopsub/loopsub ../data/bunnynh_sub500.obj
 ```
 何も表示されないウインドウが出てきたら正常に実行できています．
 
