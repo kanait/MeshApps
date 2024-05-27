@@ -7,25 +7,27 @@
 
 コンパイル方法はPCの種類によって異なります．
 
-[Windows]
+## Windows
 
 コンパイルには Visual Studio Community が必要です．
 https://visualstudio.microsoft.com/ja/vs/community/
+(インストールの際，必ず「C++ によるデスクトップ開発」を選択すること)
 
-VC のフォルダの中の loopsub.sln をダブルクリックして Release x64 でコンパイルしてください．
+VC のフォルダの中の loopsub.sln をダブルクリックして Release x64 でビルドしてください．
 コンパイルが終了したらターミナルを開いて展開フォルダに行き
 ```
 % .\VC\x64\Release\loopsub.exe .\data\bunnynh_sub500.obj
 ```
 を実行してみてください．何も表示されないウインドウが出てきたら正常に実行できています．
 
-[macOS]
+## macOS
 
-ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake が必要です．
+ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake, eigen が必要です．
 g++, make は xcode command line tools が必要となります．
-GLFW, GLEW, cmake は，brew を使ってあらかじめインストールしてください．
+GLFW, GLEW, cmake, eigen は，brew を使ってあらかじめインストールしてください．
+(eigen はもともと入っていますが，brew で入れたものを使う方がコンパイルできる可能性が高いです)
 ```
-% brew install glfw glew cmake
+% brew install glfw glew cmake eigen
 ```
 展開フォルダの中で以下を実行してください．
 ```
@@ -41,12 +43,15 @@ GLFW, GLEW, cmake は，brew を使ってあらかじめインストールして
 ```
 何も表示されないウインドウが出てきたら正常に実行できています．
 
-[linux(ubuntu)]
+## linux(ubuntu)
 
-GLFW, GLEW, cmake をapt 等を使ってインストールする必要があります．
+GLFW, GLEW, cmake, eigen をapt 等を使ってインストールする必要があります．
+```
+% sudo apt install libglfw3-dev libglew-dev cmake libeigen3-dev
+```
 あとは macOS と一緒です．
 
-[data]
+## data
 
 bunnynh_sub500.obj, venus_sub1000.obj ... Loop 細分割用データ
 41.obj, oloid64_quad.obj, spot_quadrangualted.obj ... Catmull-Clark 細分割用データ
