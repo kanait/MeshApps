@@ -15,7 +15,7 @@ https://visualstudio.microsoft.com/ja/vs/community/
 VC のフォルダの中の loopsub.sln をダブルクリックして Release x64 でコンパイルしてください．
 コンパイルが終了したらターミナルを開いて展開フォルダに行き
 ```
-% .\VC\x64\Release\loopsub.exe bunnynh_sub500.obj
+% .\VC\x64\Release\loopsub.exe .\data\bunnynh_sub500.obj
 ```
 を実行してみてください．何も表示されないウインドウが出てきたら正常に実行できています．
 
