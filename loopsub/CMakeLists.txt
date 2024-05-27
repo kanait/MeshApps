@@ -4,8 +4,9 @@ project( loopsub )
 if(UNIX)
         find_package(GLFW REQUIRED)
         find_package(GLEW REQUIRED)
+        find_package(Eigen3 REQUIRED)
+        find_package(OpenGL REQUIRED)
 endif(UNIX)
-find_package(OpenGL REQUIRED)
 
 # for Linux
 if(UNIX AND NOT APPLE)
@@ -23,8 +24,8 @@ if(UNIX)
                                     ${OPENGL_INCLUDE_DIR}
                                     ${GLEW_INCLUDE_DIR}
                                     ${GLFW_INCLUDE_DIR}
+                                    ${Eigen3_INCLUDE_DIR}
                                     ${PROJECT_SOURCE_DIR}/../render_Eigen
-                                    ${PROJECT_SOURCE_DIR}/../eigen
                                     ${PROJECT_SOURCE_DIR}/../util
                                     ${PROJECT_SOURCE_DIR}/../meshL
                                     )
@@ -37,6 +38,7 @@ if(UNIX)
         target_link_libraries( ${PROJECT_NAME}
                                PRIVATE
                                ${OPENGL_LIBRARIES}
+                               Eigen3::Eigen
                                GLEW::GLEW
                                ${GLFW_LIBRARY}
                                )
