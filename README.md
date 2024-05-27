@@ -20,6 +20,8 @@ VC のフォルダの中の loopsub.sln をダブルクリックして Release x
 ```
 を実行してみてください．何も表示されないウインドウが出てきたら正常に実行できています．
 
+あるいは，展開フォルダにある run_bunnynh_sub500.bat や run_venus_sub1000.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
+
 ## macOS
 
 ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake, eigen が必要です．
