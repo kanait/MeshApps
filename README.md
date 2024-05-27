@@ -1,3 +1,12 @@
+# プログラミング課題用レポジトリ
+
+まずこのレポジトリをクローンします．
+```
+% git clone https://github.com/kanait/loopsub.git
+```
+
+コンパイル方法はPCの種類によって異なります．
+
 [Windows]
 
 コンパイルには Visual Studio Community が必要です．
@@ -36,3 +45,8 @@ GLFW, GLEW, cmake は，brew を使ってあらかじめインストールして
 
 GLFW, GLEW, cmake をapt 等を使ってインストールする必要があります．
 あとは macOS と一緒です．
+
+[data]
+
+bunnynh_sub500.obj, venus_sub1000.obj ... Loop 細分割用データ
+41.obj, oloid64_quad.obj, spot_quadrangualted.obj ... Catmull-Clark 細分割用データ
