@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: VertexLCirculator.hxx 2021/06/05 14:20:31 kanai Exp $
+// $Id: VertexLCirculator.hxx 2024/06/07 14:15:38 kanai Exp $
 //
 // Copyright (c) 2021 Takashi Kanai
 // Released under the MIT license
@@ -19,7 +19,7 @@ class VertexLCirculator {
   VertexL* vt_;
 
 protected:
-  
+
   HalfedgeL* temp_halfedge_;
 
 public:
@@ -39,7 +39,7 @@ public:
     assert( temp_halfedge_ );
     return temp_halfedge_->face();
   };
-  
+
   FaceL* nextFaceL() {
     HalfedgeL* he = temp_halfedge_;
     temp_halfedge_ = he->prev()->mate();
@@ -56,7 +56,7 @@ public:
     if ( vt_->halfedge()->mate() == NULL ) return NULL;
     return vt_->halfedge()->mate()->face();
   };
-  
+
   //
   // vertex -> vertex
   //
@@ -83,12 +83,12 @@ public:
   VertexL* firstVertexL() {
     return vt_->halfedge()->next()->vertex();
   };
-  
+
   VertexL* lastVertexL() {
     if ( vt_->halfedge()->mate() == NULL ) return NULL;
     return vt_->halfedge()->mate()->next()->vertex();
   };
-  
+
   //
   // vertex -> halfedge
   //
@@ -105,15 +105,22 @@ public:
     return temp_halfedge_;
   };
 
+  HalfedgeL* prevHalfedgeL() {
+    HalfedgeL* he = temp_halfedge_;
+    temp_halfedge_ = he->mate()->next();
+    if ( temp_halfedge_ == NULL ) return NULL;
+    return temp_halfedge_;
+  };
+
   HalfedgeL* firstHalfedgeL() {
     return vt_->halfedge();
   }
-  
+
   HalfedgeL* lastHalfedgeL() {
     if ( vt_->halfedge()->mate() == NULL ) return NULL;
     return vt_->halfedge()->mate()->next();
   };
-  
+
   //
   //  vertex -> reverse halfedge
   //
@@ -133,7 +140,7 @@ public:
   HalfedgeL* firstRevHalfedgeL() {
     return vt_->halfedge()->prev();
   };
-  
+
   HalfedgeL* lastRevHalfedgeL() {
     if ( vt_->halfedge()->mate() == NULL ) return NULL;
     return vt_->halfedge()->mate();
@@ -147,7 +154,7 @@ public:
 //      cout << endl;
     return count;
   };
-  
+
   int num_faces() {
     int count=0;
     FaceL* fc = beginFaceL();
@@ -156,11 +163,12 @@ public:
 //      cout << endl;
     return count;
   };
-  
-  
+
+  void setfirstHalfedge(HalfedgeL* he) {
+    vt_->setHalfedge(he);
+  };
+
 };
-  
-  
+
+
 #endif // _VERTEXLCIRCULATOR_HXX
-
-

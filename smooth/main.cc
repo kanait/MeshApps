@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: main.cc 2024/06/05 22:44:44 kanai Exp $
+// $Id: main.cc 2024/06/07 15:08:31 kanai Exp $
 //
 // Copyright (c) 2024 by Takashi Kanai. All rights reserved.
 //
@@ -68,6 +68,16 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action,
       glmeshl.setIsDrawWireframe(true);
     } else {
       glmeshl.setIsDrawWireframe(false);
+    }
+    return;
+  }
+
+  // s
+  else if ((key == GLFW_KEY_S) && (action == GLFW_PRESS)) {
+    if (glmeshl.isSmoothShading() == false) {
+      glmeshl.setIsSmoothShading(true);
+    } else {
+      glmeshl.setIsSmoothShading(false);
     }
     return;
   }
@@ -142,6 +152,56 @@ static void windowsize_callback(GLFWwindow* window, int w, int h) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+// 角度（ラジアン）
+#define DEG45 0.785398     // M_PI/4.0
+#define DEG30 0.523599     // M_PI/6.0
+#define DEG20 0.349066     // M_PI/9.0
+#define DEG10 0.174533     // M_PI/18.0
+
+// crease の判定
+bool isCrease( HalfedgeL* he ) {
+  if (he->mate() == NULL) return false;
+  Eigen::Vector3d& lnm = he->face()->normal();
+  Eigen::Vector3d& rnm = he->mate()->face()->normal();
+  if (V3AngleBetweenVectors( lnm, rnm ) > DEG30) return true;
+  return false;
+}
+
+void calcSmoothVertexNormalWithCrease( MeshL& mesh ) {
+
+  // ハーフエッジデータ構造の作成
+  mesh.createConnectivity(true);
+
+  std::list<VertexL*>& vertices = mesh.vertices();
+  std::list<NormalL*>& normals = mesh.normals();
+
+  // エッジが crease のときそのエッジを頂点からリンクする
+  for ( auto vt : vertices ) {
+
+    // 頂点 vt を持つハーフエッジを辿る
+    VertexLCirculator vc(vt);
+    HalfedgeL* vh = vc.beginHalfedgeL();
+    do {
+      if ( (vh->mate() != NULL) && (isCrease(vh) == true) ) {
+        // 頂点からハーフエッジのリンクの付け替え
+        vc.setfirstHalfedge(vh);
+        break;
+      }
+      vh = vc.prevHalfedgeL();
+
+    } while ((vh != vc.firstHalfedgeL()) && (vh != NULL));
+  }
+
+  // NormalL（頂点法線）のインスタンスの作成
+  // Crease がある場合，新しい Normal を作成する
+  ////////////////////// ここから //////////////////////////
+
+
+  /////////////////// ここまでを埋める //////////////////////
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char** argv) {
   if (argc != 2) {
     std::cerr << "Usage: " << argv[0] << " in.obj" << std::endl;
@@ -155,13 +215,14 @@ int main(int argc, char** argv) {
   }
 
   // Smooth Shading 用法線ベクトルの生成
+  calcSmoothVertexNormalWithCrease(mesh);
 
   // ここからウインドウの初期化処理
   glfwSetErrorCallback(error_callback);
   if (!glfwInit()) return EXIT_FAILURE;
 
   GLFWwindow* window =
-      glfwCreateWindow(width, height, "GLFW Window", NULL, NULL);
+    glfwCreateWindow(width, height, "GLFW Window", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return EXIT_FAILURE;
@@ -177,11 +238,11 @@ int main(int argc, char** argv) {
   pane.initGL();
   pane.initGLEW();
 
+  glfwSwapInterval(0);
+  // ここまでウインドウの初期化処理
+
   // メッシュ表示用 に mesh をセット
   glmeshl.setMesh(mesh);
-
-  glfwSwapInterval(0);
-  // ここまで
 
   // 描画ループ処理
   while (!glfwWindowShouldClose(window)) {
