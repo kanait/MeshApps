@@ -1,8 +1,9 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: main.cc 2024/06/07 15:08:31 kanai Exp $
+// $Id: main.cc 2024/06/08 02:08:00 kanai Exp $
 //
-// Copyright (c) 2024 by Takashi Kanai. All rights reserved.
+// Copyright (c) 2024 Takashi Kanai
+// Released under the MIT license
 //
 ////////////////////////////////////////////////////////////////////
 
