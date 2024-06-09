@@ -12,4 +12,5 @@ SET(CMAKE_C_COMPILER_WORKS 1 CACHE INTERNAL "")
 SET(CMAKE_CXX_COMPILER_WORKS 1 CACHE INTERNAL "")
 
 add_subdirectory( loopsub )
+add_subdirectory( ccsub )
 add_subdirectory( smooth )
