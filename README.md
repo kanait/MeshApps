@@ -24,6 +24,17 @@ VC のフォルダの中の loopsub.sln をダブルクリックして Release x
 
 あるいは，展開フォルダにある run_bunnynh_sub500.bat や run_venus_sub1000.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
 
+### ccsub
+
+VC のフォルダの中の ccsub.sln をダブルクリックして Release x64 でビルドしてください．
+コンパイルが終了したらターミナルを開いて展開フォルダに行き
+```
+% .\VC\x64\Release\ccsub.exe .\data\41.obj
+```
+を実行してみてください．41 が表示されたら正常に実行できています．
+
+あるいは，展開フォルダにある run_41.bat や run_oloid64.bat，run_spot.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
+
 ### smooth
 
 VC のフォルダの中の smooth.sln をダブルクリックして Release x64 でビルドしてください．
@@ -60,6 +71,13 @@ GLFW, GLEW, cmake, eigen は，brew を使ってあらかじめインストー�
 % ./loopsub/loopsub ../data/bunnynh_sub500.obj
 ```
 何も表示されないウインドウが出てきたら正常に実行できています．
+
+### ccsub
+
+```
+% ./ccsub/ccsub ../data/41.obj
+```
+41 が表示されたら正常に実行できています．
 
 ### smooth
 
