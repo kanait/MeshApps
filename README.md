@@ -46,6 +46,17 @@ VC のフォルダの中の smooth.sln をダブルクリックして Release x6
 
 あるいは，展開フォルダにある run_fandisk.bat や run_mechpart.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
 
+### octree
+
+VC のフォルダの中の octree.sln をダブルクリックして Release x64 でビルドしてください．
+コンパイルが終了したらターミナルを開いて展開フォルダに行き
+```
+% .\VC\x64\Release\octree.exe .\data\bunny.obj
+```
+を実行してみてください．bunny が表示されたら正常に実行できています．
+
+あるいは，展開フォルダにある run_octree_bunny.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
+
 ## macOS
 
 ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake, eigen が必要です．
@@ -86,6 +97,13 @@ GLFW, GLEW, cmake, eigen は，brew を使ってあらかじめインストー�
 ```
 fandisk が表示されたら正常に実行できています．
 
+### octree
+
+```
+% ./octree/octree ../data/bunny.obj
+```
+bunny が表示されたら正常に実行できています．
+
 ## linux/WSL2 ubuntu
 
 g++ make GLFW, GLEW, cmake, eigen を apt 等を使ってインストールする必要があります．
@@ -103,3 +121,5 @@ data データの中に以下のファイルが含まれています．
 - 41.obj, oloid64_quad.obj, spot_quadrangualted.obj ... Catmull-Clark 細分割用データ
 
 - fandisk.obj, mechpart.obj ... スムースシェーディング用データ
+
+- bunny.obj ... 八分木用データ
