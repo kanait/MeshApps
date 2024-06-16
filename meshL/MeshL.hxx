@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: MeshL.hxx 2022/05/22 20:50:55 kanai Exp $
+// $Id: MeshL.hxx 2024/06/16 14:50:44 kanai Exp $
 //
 // Copyright (c) 2021 Takashi Kanai
 // Released under the MIT license
@@ -484,6 +484,25 @@ class MeshL {
       for (auto he : fc->halfedges()) {
         he->setNormal(nm_array[he->vertex()->id()]);
       }
+    }
+  };
+
+  void computeBB( Eigen::Vector3d& bbmin, Eigen::Vector3d& bbmax ) {
+    int i = 0;
+    for (auto vt : vertices_) {
+      Eigen::Vector3d& p = vt->point();
+      if (i) {
+        if (p.x() > bbmax.x()) bbmax.x() = p.x();
+        if (p.x() < bbmin.x()) bbmin.x() = p.x();
+        if (p.y() > bbmax.y()) bbmax.y() = p.y();
+        if (p.y() < bbmin.y()) bbmin.y() = p.y();
+        if (p.z() > bbmax.z()) bbmax.z() = p.z();
+        if (p.z() < bbmin.z()) bbmin.z() = p.z();
+      } else {
+        bbmax = p;
+        bbmin = p;
+      }
+      ++i;
     }
   };
 
