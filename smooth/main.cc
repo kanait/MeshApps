@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: main.cc 2024/06/08 02:08:00 kanai Exp $
+// $Id: main.cc 2024/06/17 17:36:31 kanai Exp $
 //
 // Copyright (c) 2024 Takashi Kanai
 // Released under the MIT license
@@ -22,7 +22,7 @@ using namespace std;
 #include "SMFLIO.hxx"
 
 MeshL mesh; // メッシュ
-SMFLIO smflio;
+SMFLIO smflio; // メッシュのIO
 
 #include "GLMeshL.hxx"
 #include "GLPanel.hxx"
