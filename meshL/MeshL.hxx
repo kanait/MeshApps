@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: MeshL.hxx 2024/06/16 14:50:44 kanai Exp $
+// $Id: MeshL.hxx 2024/06/17 17:36:01 kanai Exp $
 //
-// Copyright (c) 2021 Takashi Kanai
+// Copyright (c) 2021-2024 Takashi Kanai
 // Released under the MIT license
 //
 ////////////////////////////////////////////////////////////////////
