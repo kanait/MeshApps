@@ -1,8 +1,8 @@
 ﻿////////////////////////////////////////////////////////////////////
 //
-// $Id: GLPanel.hxx 2022/05/22 03:29:18 kanai Exp $
+// $Id: GLPanel.hxx 2024/06/23 10:48:25 kanai Exp $
 //
-// Copyright (c) 2021 Takashi Kanai
+// Copyright (c) 2021-2024 Takashi Kanai
 // Released under the MIT license
 //
 ////////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <math.h>
+//#include <math.h>
 using namespace std;
 
 #include "myEigen.hxx"
@@ -49,7 +49,7 @@ using namespace std;
 class GLPanel {
 
 public:
-  
+
   GLPanel() {};
   virtual ~GLPanel() {};
 
@@ -77,7 +77,7 @@ public:
   void initViewParameters( int w, int h ) {
     // set projection parameters
     fov_ = 30.0f;
-    aspect_ = (double) w / (double) h;
+    aspect_ = static_cast<float>(w) / static_cast<float>(h);
     //   nearP_ = 1.0f;
     //   farP_ = 10.0f;
     nearP_ = .01f;
@@ -418,20 +418,34 @@ public:
     ::glDisable( GL_DEPTH_TEST );
   };
 
+void setView2d() {
+    ::glMatrixMode(GL_PROJECTION);
+    ::glLoadIdentity();
+
+    // gluOrtho2Dの代わりにglOrthoを使用
+    ::glOrtho(0.0, w(), 0.0, h(), -1.0, 1.0);
+
+    ::glMatrixMode(GL_MODELVIEW);
+    ::glLoadIdentity();
+
+    ::glTranslatef(move2d_x_, move2d_y_, 0.0f);
+    ::glScalef(scale2d_, scale2d_, 1.0f);
+}
+
+#if 0
   void setView2d() {
     ::glMatrixMode( GL_PROJECTION );
     ::glLoadIdentity();
-#ifdef APPLE
-    
-#else
+
     ::gluOrtho2D( .0f, w(), .0f, h() );
-#endif
+
     ::glMatrixMode( GL_MODELVIEW );
     ::glLoadIdentity();
 
     ::glTranslatef( move2d_x_, move2d_y_, .0f );
     ::glScalef( scale2d_, scale2d_, 1.0f );
   };
+#endif
 
   void finish2d() {
     ::glFinish();
@@ -453,7 +467,7 @@ public:
     light_[1].setIsOn( false );
     light_[2].setIsOn( false );
     light_[3].setIsOn( false );
-  
+
     ::glPolygonMode( GL_BACK, GL_FILL );
     //   ::glCullFace( GL_BACK );
     //   ::glEnable( GL_CULL_FACE );
@@ -463,7 +477,7 @@ public:
     //   ::glDepthFunc( GL_LEQUAL );
     ::glDepthFunc( GL_LESS );
     //   ::glClearDepth( 1.0f );
-  
+
     ::glEnable( GL_NORMALIZE );
 
     // transparency settings
@@ -512,10 +526,8 @@ public:
   void changeSize( int w, int h ) {
     setW( w );
     setH( h );
-
-    aspect_ = (double) w / (double) h;
-
-    manip_.setHalfWHL( (int) ((float) w / 2.0), (int) ((float) h / 2.0) );
+    aspect_ = static_cast<float>(w) / static_cast<float>(h);
+    manip_.setHalfWHL( (int) (static_cast<float>(w) / 2.0f), (int) (static_cast<float>(h) / 2.0f) );
   };
 
   //
@@ -598,6 +610,29 @@ public:
   };
 
   void setPerspective() {
+    aspect_ = static_cast<float>(w()) / static_cast<float>(h());
+
+    // 視野角をラジアンに変換
+    float fov_rad = fov_ * M_PI / 180.0;
+    float f = 1.0 / tan(fov_rad / 2.0);
+
+    float near_minus_far = nearP_ - farP_;
+
+    // 透視投影行列を手動で計算
+    float perspective[16] = {
+      f / aspect_, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (farP_ + nearP_) / near_minus_far, -1,
+      0, 0, (2.0f * farP_ * nearP_) / near_minus_far, 0
+    };
+
+    // OpenGLに投影行列を設定
+    ::glMatrixMode(GL_PROJECTION);
+    ::glLoadMatrixf(perspective);
+    ::glMatrixMode(GL_MODELVIEW);
+  };
+#if 0
+  void setPerspective() {
     aspect_ = (double) w() / (double) h();
     //#ifdef __APPLE__
     //GLKMatrix4MakePerspective( fov_, aspect_, nearP_, farP_ );
@@ -605,24 +640,39 @@ public:
     ::gluPerspective( fov_, aspect_, nearP_, farP_ );
     //#endif
   }
+#endif
 
+  // 正規化ヘルパー関数
+  Eigen::Vector3f normalize(const Eigen::Vector3f& v) {
+    return v / v.norm();
+  };
+
+  // 交差積ヘルパー関数
+  Eigen::Vector3f cross(const Eigen::Vector3f& a, const Eigen::Vector3f& b) {
+    return Eigen::Vector3f(a.y() * b.z() - a.z() * b.y(),
+                           a.z() * b.x() - a.x() * b.z(),
+                           a.x() * b.y() - a.y() * b.x());
+  };
+
+  // モデルビュー行列を設定する関数
   void setModelView() {
-    ::glMatrixMode( GL_MODELVIEW );
+    ::glMatrixMode(GL_MODELVIEW);
     ::glLoadIdentity();
 
-    //#ifdef __APPLE__
-    //    GLKMatrix4MakeLookAt( view_point_.x(), view_point_.y(), view_point_.z(),
-    //                          look_point_.x(), look_point_.y(), look_point_.z(), 0.0, 1.0, 0.0 );
-    //#else
-    ::gluLookAt( view_point_.x(), view_point_.y(), view_point_.z(),
-                 look_point_.x(), look_point_.y(), look_point_.z(), 0.0, 1.0, 0.0 );
-    //#endif
+    Eigen::Vector3f forward = normalize(look_point_ - view_point_);
+    Eigen::Vector3f up(0.0, 1.0, 0.0);
+    Eigen::Vector3f side = normalize(cross(forward, up));
+    up = cross(side, forward);
 
-#if 0
-    Eigen::Vector3f look = view_point_ + view_vector_;
-    ::gluLookAt( view_point_.x, view_point_.y, view_point_.z,
-                 look.x, look.y, look.z, 0.0, 1.0, 0.0 );
-#endif    
+    float modelview[16] = {
+      side.x(), up.x(), -forward.x(), 0.0,
+      side.y(), up.y(), -forward.y(), 0.0,
+      side.z(), up.z(), -forward.z(), 0.0,
+      0.0,     0.0,   0.0,         1.0
+    };
+
+    ::glMultMatrixf(modelview);
+    ::glTranslatef(-view_point_.x(), -view_point_.y(), -view_point_.z());
 
     // from Arcball
     ::glTranslatef( 0, 0, manip_.seezo() );
@@ -631,7 +681,24 @@ public:
     Eigen::Vector3f o = manip_.offset();
     ::glTranslatef( -o.x(), -o.y(), -o.z() );
   };
-  
+
+#if 0
+  void setModelView() {
+    ::glMatrixMode( GL_MODELVIEW );
+    ::glLoadIdentity();
+
+    ::gluLookAt( view_point_.x(), view_point_.y(), view_point_.z(),
+                 look_point_.x(), look_point_.y(), look_point_.z(), 0.0, 1.0, 0.0 );
+
+    // from Arcball
+    ::glTranslatef( 0, 0, manip_.seezo() );
+    //::glMultMatrixf( (GLfloat *)(&(manip_.mNow().m00)) );
+    ::glMultMatrixf( manip_.mNow().data() );
+    Eigen::Vector3f o = manip_.offset();
+    ::glTranslatef( -o.x(), -o.y(), -o.z() );
+  };
+#endif
+
   void setView() {
     setProjectionView();
     setModelView();
@@ -644,7 +711,7 @@ public:
     ::glGetFloatv( GL_PROJECTION_MATRIX, m );
     bool isPerspective;
 
-    if (m[15] == 0.0) 
+    if (m[15] == 0.0)
       {
         // perspective
         //       float p[16];
@@ -673,7 +740,7 @@ public:
         *nearOut = nearZ;
         *farOut = farZ;
       }
-    else 
+    else
       {
         // orthographic
         const float x = m[0];  //  2 / (R-L)
@@ -718,7 +785,7 @@ public:
   void setLight() {
     for ( int i = 0; i < num_lights_; ++i )
       {
-        if ( isLightOn(i) ) light_[i].on(); 
+        if ( isLightOn(i) ) light_[i].on();
         else light_[i].off();
       }
   };
@@ -734,6 +801,7 @@ public:
     setView();
     setLight();
 
+#if 0
     ::glEnable( GL_LIGHTING );
     GLMaterial glm;
     glm.bind();
@@ -743,7 +811,7 @@ public:
 
     GLUquadricObj   *qobj;
     GLint slices = 50,staks = 50;
-	
+
     if ((qobj = gluNewQuadric()) != NULL) {
       ::glPushMatrix();
       ::glShadeModel( GL_SMOOTH );
@@ -754,6 +822,7 @@ public:
     }
 
     ::glDisable( GL_LIGHTING );
+#endif
 
     finish();
   };
@@ -768,17 +837,17 @@ public:
   void setLookPoint( Eigen::Vector3f& p ) { look_point_ = p; };
   void setLookPoint( float x, float y, float z ) { look_point_ = Eigen::Vector3f(x, y, z); };
 
-  void setViewParameters( double width, double height, double fov, double nearP, double farP ) {
+  void setViewParameters( float width, float height, float fov, float nearP, float farP ) {
     fov_ = fov;
     nearP_ = nearP;
     farP_ = farP;
-    aspect_ = (double) width / (double) height;
+    aspect_ = width / height;
   };
-  void setNearFarPlanes( double nearP, double farP ) {
+  void setNearFarPlanes( float nearP, float farP ) {
     nearP_ = nearP;
     farP_ = farP;
   };
-  void setFOV( double fov ) {
+  void setFOV( float fov ) {
     fov_ = fov;
   };
 
@@ -821,7 +890,7 @@ public:
   void setLightPos( int i, Eigen::Vector3f& p ) {
     light_[i].setPos( p.x(), p.y(), p.z(), 0.0f );
   };
-    
+
   void setLightPos( int i, float l0, float l1, float l2, float l3 ) {
 //     light_position_[4*i]   = l0;
 //     light_position_[4*i+1] = l1;
@@ -830,7 +899,7 @@ public:
     light_[i].setPos( l0, l1, l2, l3 );
   };
 
-  void getLightPos( int i, Eigen::Vector3f& p ) { 
+  void getLightPos( int i, Eigen::Vector3f& p ) {
     float w;
     light_[i].getPos( &(p.x()), &(p.y()), &(p.z()), &w );
   };
@@ -841,13 +910,13 @@ public:
     p.z() = light_position_[4*i+2];
   };
 
-  void getLightPos( int i, float lpos[] ) { 
+  void getLightPos( int i, float lpos[] ) {
     lpos[0] = light_position_[4*i];
     lpos[1] = light_position_[4*i+1];
     lpos[2] = light_position_[4*i+2];
     lpos[3] = light_position_[4*i+3];
   };
-  void getLightVec( int i, float lvec[] ) { 
+  void getLightVec( int i, float lvec[] ) {
     lvec[0] = -light_position_[4*i];
     lvec[1] = -light_position_[4*i+1];
     lvec[2] = -light_position_[4*i+2];
@@ -857,7 +926,7 @@ public:
   void getRealLightPosition( Eigen::Vector3f& p ) {
     getRealLightPosition( 0, p );
   };
-    
+
   // get "real" light position
   void getRealLightPosition( int i, Eigen::Vector3f& p ) {
 #if 0
@@ -876,9 +945,9 @@ public:
   void getRealLightPosition( int i, float* pos ) {
     Eigen::Vector3f p;
     getRealLightPosition( i, p );
-    pos[0] = p.x(); pos[1] = p.y(); pos[2] = p.z(); 
+    pos[0] = p.x(); pos[1] = p.y(); pos[2] = p.z();
   };
-    
+
   void getRealLightPosition( float* pos ) {
     getRealLightPosition( 0, pos );
   };
@@ -886,22 +955,20 @@ public:
   void setLightParameters( int i, float* light ) {
     light_[i].set( light );
   };
-    
-#if 0  
+
+#if 0
   // wireframe color functions
   float* wfColor() { return &(wfrgb_[0]); };
-  void setWireframeColor( unsigned char r, unsigned char g,
-			   unsigned char b ) {
+  void setWireframeColor( unsigned char r, unsigned char g, unsigned char b ) {
     wfrgb_[0] = (float) r / 255.0;
     wfrgb_[1] = (float) g / 255.0;
     wfrgb_[2] = (float) b / 255.0;
   };
 #endif
-  
+
   // background color functions
   float* bgColor() { return &(bgrgb_[0]); };
-  void setBackgroundColor( unsigned char r, unsigned char g,
-			   unsigned char b ) {
+  void setBackgroundColor( unsigned char r, unsigned char g, unsigned char b ) {
     bgrgb_[0] = (float) r / 255.0;
     bgrgb_[1] = (float) g / 255.0;
     bgrgb_[2] = (float) b / 255.0;
@@ -911,7 +978,7 @@ public:
     bgrgb_[1] = g;
     bgrgb_[2] = b;
   };
-  
+
   void setSize( int w, int h ) {
     setW( w );
     setH( h );
@@ -928,7 +995,7 @@ public:
   };
 
   // rotate, translation and zoom function
-  
+
   void setScreenXY( int x, int y ) {
     manip_.setScrnXY( x, y );
     x0_ = x;
@@ -941,7 +1008,7 @@ public:
     manip_.vFrom( manip_.mouse_on_sphere( manip_.scrn_x(),
                                           manip_.scrn_y(),
                                           manip_.halfW(),
-                                          manip_.halfH() ) );  
+                                          manip_.halfH() ) );
   };
 
   void startMove() { setIsMove( true ); };
@@ -951,7 +1018,7 @@ public:
     manip_.vTo( manip_.mouse_on_sphere(x, y, manip_.halfW(),
                                        manip_.halfH()) );
     manip_.updateRotate( x, y );
-    manip_.setScrnXY( x, y );  
+    manip_.setScrnXY( x, y );
   };
 
   void updateMove( int x, int y ) {
@@ -968,18 +1035,18 @@ public:
     manip_.setScrnXY( x, y );
   };
 
-  
+
   void updateMove2d( int x, int y ) {
     move2d_x_ += (float) (x - x0_); x0_ = x;
     move2d_y_ -= (float) (y - y0_); y0_ = y;
   };
-  
+
   void updateZoom2d( int x, int y ) {
     scale2d_ -= .1f * (float) (y - s0_); s0_ = y;
     if ( scale2d_ < .01f ) scale2d_ = .01f;
   };
 
-  
+
   void finishRMZ() {
     setIsRotate( false );
     setIsZoom( false );
@@ -999,8 +1066,8 @@ public:
     y0_ = 0;
     s0_ = 0;
   };
-  
-  // 
+
+  //
   bool isRotate() const { return rotateFlag_; };
   bool isMove() const { return moveFlag_; };
   bool isZoom() const { return zoomFlag_; };
@@ -1036,6 +1103,43 @@ public:
   //                  int* format, int* w, int* h ) {
   //
   // "non-use PNGImage" version
+  unsigned int loadTexture(unsigned char* image, int w, int h, int channel) {
+    // the first load
+    if (!numUnits_) initTexture();
+    if (current_tex_id_ >= numUnits_) return -1;
+
+    int i = current_tex_id_;
+    ::glBindTexture(GL_TEXTURE_2D, texObj_[i]);
+
+    // Set texture parameters
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // Load texture data
+    if (channel == 3) {
+      ::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    } else if (channel == 4) {
+      ::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    } else {
+      // Handle unsupported channel size
+      ::glBindTexture(GL_TEXTURE_2D, 0);
+      return -1;
+    }
+
+    // Generate mipmaps
+    ::glGenerateMipmap(GL_TEXTURE_2D);
+
+    isTexEnabled_[i] = GL_TRUE;
+
+    current_tex_id_++;
+
+    ::glBindTexture(GL_TEXTURE_2D, 0);
+
+    return texObj_[i];
+  };
+#if 0
   unsigned int loadTexture( unsigned char* image, int w, int h, int channel ) {
 
     // the first load
@@ -1052,7 +1156,7 @@ public:
     // ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
     if ( channel == 3 )
-      //::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image); 
+      //::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
       ::gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, w, h, GL_RGB, GL_UNSIGNED_BYTE, image );
     else if( channel == 4 )
       //::glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
@@ -1069,40 +1173,48 @@ public:
     ::glBindTexture( GL_TEXTURE_2D, 0 );
 
     return texObj_[i];
-  }
+  };
+#endif
 
+  void assignTexture(int id, std::vector<unsigned char>& img, int format, int w, int h) {
+    ::glBindTexture(GL_TEXTURE_2D, id);
+
+    ::glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    ::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    ::glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, img.data());
+
+    ::glGenerateMipmap(GL_TEXTURE_2D);
+
+    ::glBindTexture(GL_TEXTURE_2D, 0);
+  };
+
+#if 0
   void assignTexture( int id, std::vector<unsigned char>& img,
                       int format, int w, int h ) {
     ::glBindTexture( GL_TEXTURE_2D, id );
 
     ::glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    // ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    // ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     ::glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 
-    //GLint format;
-    //if ( pngimage.channel()==3) format = GL_RGB; else format = GL_RGBA;
 #if 1
     ::gluBuild2DMipmaps( GL_TEXTURE_2D,
                          format,
-                         w, h, 
+                         w, h,
                          format,
                          GL_UNSIGNED_BYTE,
                          &(img[0]) );
 #endif
-  
-#if 0
-    ::glTexImage2D( GL_TEXTURE_2D, 0,
-                    pngimage.channel(),
-                    pngimage.w(), pngimage.h(),
-                    0,
-                    format, GL_UNSIGNED_BYTE, &(img[0]) );
-#endif
+
     ::glBindTexture( GL_TEXTURE_2D, 0 );
   };
+#endif
 
   //
   // window capture functions
@@ -1143,12 +1255,12 @@ public:
   // gradient background functions
   void setIsGradientBackground( bool f ) { gradientBackground_ = f; };
   bool isGradientBackground() const { return gradientBackground_; };
-  
+
   // arcball
   Arcball& manip() { return manip_; };
 
 private:
-  
+
   int width_;
   int height_;
 
@@ -1156,10 +1268,10 @@ private:
   float bgrgb_[3];
 
   // projection parameters
-  double fov_;
-  double aspect_;
-  double nearP_;
-  double farP_;
+  float fov_;
+  float aspect_;
+  float nearP_;
+  float farP_;
 
   //
   // Light
@@ -1167,12 +1279,12 @@ private:
 
   static const int num_lights_ = 4;
   std::vector<GLLight> light_;
-  
+
   //SelList sel_list_;
 
   // Transformation Flag
   bool rotateFlag_;
-  bool moveFlag_; 
+  bool moveFlag_;
   bool zoomFlag_;
 
   // Texture
@@ -1213,7 +1325,7 @@ private:
   // 0. phong shading 1. gouraud shading 2. wireframe 3. phong + texture 4. color
   GLuint gl2Program_[5];
   int isProgramUsed_;
-  
+
 
   /*
   ** シェーダーのソースプログラムをメモリに読み込む
