@@ -57,6 +57,17 @@ VC のフォルダの中の octree.sln をダブルクリックして Release x6
 
 あるいは，展開フォルダにある run_octree_bunny.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
 
+### kdtree2d
+
+VC のフォルダの中の kdtree2d.sln をダブルクリックして Release x64 でビルドしてください．
+コンパイルが終了したらターミナルを開いて展開フォルダに行き
+```
+% .\VC\x64\Release\kdtree2d.exe
+```
+を実行してみてください．2Dの画面に黒い点群が表示されたら正常に実行できています．
+
+あるいは，展開フォルダにある run_kdtree2d.bat をダブルクリックすれば，ターミナルを開かずに実行できます．
+
 ## macOS
 
 ソースコードのコンパイルには g++, make, GLFW, GLEW, cmake, eigen が必要です．
@@ -103,6 +114,13 @@ fandisk が表示されたら正常に実行できています．
 % ./octree/octree ../data/bunny.obj
 ```
 bunny が表示されたら正常に実行できています．
+
+### kdtree2d
+
+```
+% ./kdtree2d/kdtree2d
+```
+2Dの画面に黒い点群が表示されたら正常に実行できています．
 
 ## linux/WSL2 ubuntu
 
