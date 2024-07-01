@@ -1,6 +1,6 @@
 ﻿////////////////////////////////////////////////////////////////////
 //
-// $Id: main.cc 2023/07/02 23:35:41 kanai Exp $
+// $Id: main.cc 2024/07/01 14:17:06 kanai Exp $
 //
 // Copyright (c) 2022 by Takashi Kanai. All rights reserved.
 //
@@ -172,6 +172,19 @@ int main(int argc, char** argv) {
   }
 
   //
+  // ここから
+  // mesh の Bounding Box を計算
+
+  // octree の構築
+  // 面を格納 （addFaceToOctree を利用）
+
+  // Octree を利用
+  // 点 pos を通り，方向 dir のレイとメッシュの交点のうち，pos に一番近い点 np を取得
+  // なければ nfid = -1
+  // 関数を別途作成して呼び出す
+
+  // ここまで
+  //
   // 表示用設定 （ここから先は特に触らなくても良い）
   //
 
@@ -222,7 +235,7 @@ int main(int argc, char** argv) {
     glVertex3d( pos.x(), pos.y(), pos.z() );
     glVertex3d( pos.x()+2.0*dir.x(), pos.y()+2.0*dir.y(), pos.z()+2.0*dir.z() );
     glEnd();
-    
+
     pane.finish();
 
     glfwSwapBuffers(window);
