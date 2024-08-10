@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: tmp.hxx 2024/06/24 01:35:42 kanai Exp $
+// $Id: KdTree.hxx 2024/08/10 14:11:21 kanai Exp $
 //
 // Copyright (c) 2024 Takashi Kanai
 // Released under the MIT license

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: CCSubL.hxx 2024/06/09 16:30:57 kanai Exp $
+// $Id: CCSubL.hxx 2024/08/10 14:14:14 kanai Exp $
 //
 // Copyright (c) 2022 Takashi Kanai
 // Released under the MIT license

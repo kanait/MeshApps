@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //
-// $Id: LoopSubL.hxx 2022/05/23 01:00:35 kanai Exp $
+// $Id: LoopSubL.hxx 2024/08/10 14:17:43 kanai Exp $
 //
 // Copyright (c) 2022 Takashi Kanai
 // Released under the MIT license
@@ -134,7 +134,7 @@ class LoopSub {
   };
 
   double beta(int valence) {
-    if (valence == 3) 
+    if (valence == 3)
       return LOOP_MASK_BETA3;
     else if (valence > 10)
       return calcBeta(valence);
