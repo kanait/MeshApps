@@ -1,8 +1,8 @@
-# プログラミング課題用レポジトリ
+# MeshApps: プログラミング課題用レポジトリ
 
 まずこのレポジトリをクローンします．
 ```
-% git clone https://github.com/kanait/loopsub.git
+% git clone https://github.com/kanait/MeshApps.git
 ```
 
 コンパイル方法はPCの種類によって異なります．
